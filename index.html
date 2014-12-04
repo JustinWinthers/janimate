@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+<style>
+
+    div {
+        background-color: darkslateblue;
+        width: 100px;
+        height: 100px;
+        transition: all .5s ease;
+    }
+</style>
+
+<!--<div id="animateme" janimate="spin('hover',180).duration('300ms').spin('leave',-180)" ></div>-->
+<div style="background-color: orange" janimate="grow('hover',2).grow('leave',.5)"></div>
+
+<div id="grow"></div>
+
+<div id="animateme" ></div>
+
+<div id="compiled" janimate="turnBackground('green').duration('4s').turnBackground('leave','red')" ></div>
+
+<script src="jAnimate.js"></script>
+<script>
+
+    // todo: figure out bug why you can't have multiple event types in a concatenation
+    // todo: unless we say the rule is that if you want more than one animation per event type then you create a new animation;
+    // jAnimate('#animateme').duration('1000ms').moveUp('click','20px').moveRight('click','180px').grow('click','3x').spin('click','75deg');
+
+
+
+    var grow = jAnimate('#grow');
+
+
+    jAnimate.newAnimation('pulsateIn',{
+        grow:'.5',
+        repeat: true
+    });
+
+    grow.newAnimation('pulsateOut',{
+        grow:'2'
+    });
+
+
+
+    grow.pulsateOut('hover').pulsateIn('leave');
+
+
+
+    var obj = jAnimate('#animateme');
+
+    obj.newAnimation('myCustomAnimation',{
+        moveUp:'20px',
+        moveRight:'180px',
+        grow:'3x',
+        spin:'175deg',
+        duration:'400ms',
+        repeat:false //default
+
+    });
+
+    obj.myCustomAnimation('click');
+
+    var otherObj = jAnimate('#compiled');
+
+    otherObj.newAnimation('myCustomAnimation',{
+        moveUp:'20px',
+        moveRight:'180px',
+        grow:'2x',
+        spin:'75deg',
+        duration:'1s'
+    });
+
+    otherObj.newAnimation('myCustomAnimationLeave',{
+        duration:'1s',
+        moveUp:'20px',
+        moveRight:'180px',
+        grow:'.5',
+        spin:'75deg',
+        repeat:true
+    });
+
+    otherObj.myCustomAnimation('click');
+    otherObj.myCustomAnimationLeave('leave');
+
+
+</script>
+</body>
+</html>

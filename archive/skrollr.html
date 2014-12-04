@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+
+    <style type="text/css">
+
+
+        pre {
+            height: 20px;
+            width: 100%;
+            position: fixed;
+            top:0px;
+            z-index: 20;
+        }
+
+        div.window {
+
+            height: 300px;
+            width: 90%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        div.parallax{
+
+            height: 500px;
+            width: 100%;
+            background-image: url('img/flower.jpg');
+            background-size: cover;
+            background-position: 0 50%;
+            background-repeat: no-repeat;
+            position: absolute;
+        }
+
+        div.circle {
+            background-color: blue;
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            position: fixed;
+            left: 300px;
+            z-index: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="circle" data-0="top:5%" data-500="top:100%"></div>
+
+<div id="skrollr-body">
+
+    <div class="window">
+        <div class="parallax" data-top-top="top:0%" data-top-bottom="top:-115%"></div>
+    </div>
+
+
+    <div class="window">
+        <div class="parallax" data-top-top="top:0%" data-top-bottom="top:-115%"></div>
+    </div>
+
+
+    <div class="window">
+        <div class="parallax" data-top-top="top:0%" data-top-bottom="top:-115%"></div>
+    </div>
+
+
+    <div class="window">
+        <div class="parallax" data-top-top="top:0%" data-top-bottom="top:-115%"></div>
+    </div>
+
+
+    <div class="window">
+        <div class="parallax" data-top-top="top:0%" data-top-bottom="top:-115%"></div>
+    </div>
+
+
+    <div class="window">
+        <div class="parallax" data-top-top="top:0%" data-top-bottom="top:-115%"></div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript" src="js/skrollr/dist/skrollr.min.js"></script>
+<script type="text/javascript">
+    var skrollr = skrollr.init({
+        smoothScrolling:true,
+        forceHeight:true
+    });
+
+    window.addEventListener("scroll", getScrollAmt);
+
+    function getScrollAmt() {
+
+        console.log ('skrollr: ', skrollr.getScrollTop());
+    }
+</script>
+
+</body>
+</html>

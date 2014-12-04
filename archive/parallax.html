@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+
+    <style type="text/css">
+
+
+        pre {
+            height: 20px;
+            width: 100%;
+            position: fixed;
+            top:0px;
+            z-index: 20;
+        }
+
+        div.window {
+
+            height: 300px;
+            width: 90%;
+            overflow: hidden;
+        }
+
+        div.parallax{
+
+            height: 500px;
+            width: 100%;
+            background-image: url('img/flower.jpg');
+            background-size: cover;
+            background-position: 0 90%;
+            position: relative;
+        }
+
+    </style>
+</head>
+<body>
+
+    <pre id="pre">value</pre>
+    <div class="window"><div class="parallax" data-parallax-speed=".5" ></div></div>
+    <div class="window"><div class="parallax" data-parallax-speed="1"></div></div>
+    <div class="window"><div class="parallax" data-parallax-speed=".5"></div></div>
+    <div class="window"><div class="parallax" data-parallax-speed="0"></div></div>
+    <div class="window"><div class="parallax"></div></div>
+
+<script>
+
+    var pre = document.getElementById('pre');
+
+    var i, scrollPos, parallaxElArray = document.getElementsByClassName('parallax');
+
+    for (i=0; i<parallaxElArray.length; i++) {
+
+        computeParallax(parallaxElArray[i]);
+
+    }
+
+    window.addEventListener("scroll", applyParallax);
+    window.addEventListener("touchmove", applyParallax);
+    //window.addEventListener("touchend", function(){alert('stop')});
+
+    function computeParallax(element){
+
+        element.parallax = {};
+
+        element.parallax.elementPosY = window.getComputedStyle(element)["backgroundPosition"].split(' ')[1].split('%')[0];
+        element.parallax.elementHeight = window.getComputedStyle(element)["height"].replace('px','');
+        element.parallax.parentHeight = window.getComputedStyle(element.parentNode)["height"].replace('px','');
+
+        element.parallax.heightDiff = element.parallax.elementHeight - element.parallax.parentHeight;
+        element.parallax.scrollStart = element.offsetTop - element.parallax.heightDiff;
+        if (element.parallax.scrollStart < 0) element.parallax.scrollStart = element.offsetTop;
+        element.parallax.scrollMax =  parseInt(element.offsetTop) + parseInt(element.parallax.elementHeight);
+
+        element.parallax.speed = element.getAttribute('data-parallax-speed');
+
+        if (!element.parallax.speed) element.parallax.speed = 1;
+
+        element.style.setProperty("-webkit-transition", "background-position ease");
+        element.style.setProperty("transition", "background-position ease");
+        element.style.setProperty("-webkit-transform", "translate3d(0,0,0)");
+
+    }
+
+    function applyParallax (event) {
+
+        //event.preventDefault();
+
+        scrollPos = getScrollXY().yPos;
+
+        pre.innerHTML = scrollPos;
+
+
+        var i;
+
+        for (i=0; i<parallaxElArray.length; i++) {
+
+
+            //this is a test to see if we can tell when the element is in view
+            //if ( (scrollPos - parallaxElArray[i].offsetTop) === 0) alert ('hit');
+
+            if (( scrollPos >= parallaxElArray[i].parallax.scrollStart )
+                    && (scrollPos < parallaxElArray[i].parallax.scrollMax ) ) {
+
+                parallaxElArray[i].parallax.scrollPct =
+                        ( (scrollPos ) - parallaxElArray[i].parallax.scrollStart) /
+                        parallaxElArray[i].parallax.parentHeight;
+
+                parallaxElArray[i].parallax.scrollOffSet = (1 - ( parallaxElArray[i].parallax.scrollPct * parallaxElArray[i].parallax.speed )) * parallaxElArray[i].parallax.elementPosY;
+
+
+                if (parallaxElArray[i].style.backgroundPositionY) {
+
+                 parallaxElArray[i].style.backgroundPositionY = parallaxElArray[i].parallax.scrollOffSet + '%';
+
+                } else {
+                 parallaxElArray[i].style.backgroundPosition = 'center ' + parallaxElArray[i].parallax.scrollOffSet + '%';
+
+                }
+
+            }
+        }
+    }
+
+    function getScrollXY() {
+        var x = 0, y = 0;
+        if( typeof( window.pageYOffset ) == 'number' ) {
+            // Netscape
+            x = window.pageXOffset;
+            y = window.pageYOffset;
+        } else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
+            // DOM
+            x = document.body.scrollLeft;
+            y = document.body.scrollTop;
+        } else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
+            // IE6 standards compliant mode
+            x = document.documentElement.scrollLeft;
+            y = document.documentElement.scrollTop;
+        }
+        return { "xPos":x, "yPos":y};
+    }
+
+</script>
+
+</body>
+</html>

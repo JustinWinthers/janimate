@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+
+<body>
+
+<style>
+    .box {
+        width: 100px;
+        height: 100px;
+        margin: 25px;
+        float: left;
+        //background-image: url("http://cdn6.fedobe.com/wp-content/uploads/2012/09/Twitter-flat-circle-256.png");
+        background-color: blue;
+        background-size: contain;
+        border-radius: 50%;
+    }
+
+    body {
+        height: 500px;
+    }
+</style>
+
+<div>
+
+    <div id='1' class='box' janimate="bounceup"></div>
+
+    <div id='2' class='box' animate-click="spin(90deg);expandRight(200%)"></div>
+
+    <div id='3' class='box' animate-click="expand(50%)"></div>
+
+    <div id='4' class='box' animate-click="spin(-90deg)"></div>
+
+    <div id='5' class='box' animate-click="spin(360deg);turnBackground(red);duration(5s)"></div>
+
+</div>
+
+<script src="janimate.js"></script>
+
+
+</body>
+</html>

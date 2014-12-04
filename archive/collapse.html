@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title></title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+
+    <style>
+
+        html, body{
+            padding: 0px;
+            height: 100%;
+            font-family: 'Open Sans';
+            background-color: #e1dcdb;
+        }
+
+        .container {
+            top: 20px;
+            margin: 10px;
+            position: relative;
+        }
+        .collapsible {
+            -webkit-transition: height .5s ease-out, opacity .3s ease;
+        }
+
+        .panel {
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+            margin-bottom: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .panel-title {
+            height: 50px;
+            width: 100%;
+            background-color: #aaaaaa;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            border: none;
+            position: relative;
+            margin: 0 auto;
+            text-align: center;
+            line-height: 55px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.75em;
+        }
+
+        .panel-summary {
+            width: 100%;
+            background-color: #a8d4d0;
+            border: none;
+            position: relative;
+            margin: 0 auto;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .panel-description {
+            width: 100%;
+            background-color: #f0f0f0;
+            border: none;
+            position: relative;
+            margin: 0 auto;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .panel-bottom {
+            height: 10px;
+            width: 100%;
+            background-color: #aaaaaa;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            border: none;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        p {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .panel-summary p {
+            color: #363636;
+            font-size: 1em;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .panel-description p {
+            color: #5b5b5b;
+            font-size: 1em;
+            font-weight: 100;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-weight: 100;
+            text-align: center;
+            color: #55565b;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Mobile example for Dan</h1>
+
+    <!-- first panel -->
+    <div class="panel">
+        <div class="panel-title">Plan A</div>
+        <div class="panel-container">
+            <div class="panel-summary collapsible">
+                <p>This is Plan A</p>
+                <p>Cost is $45</p>
+                <p>Family and Spouse</p>
+            </div>
+            <div class="panel-description collapsible">
+                <p>lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah</p>
+            </div>
+        </div>
+        <div class="panel-bottom"></div>
+    </div>
+
+    <!-- second panel -->
+    <div class="panel">
+        <div class="panel-title">Plan B</div>
+        <div class="panel-container">
+            <div class="panel-summary collapsible">
+                <p>This is Plan B</p>
+                <p>Cost is $200</p>
+                <p>Family and Spouse</p>
+            </div>
+            <div class="panel-description collapsible">
+                <p>lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah</p>
+            </div>
+        </div>
+        <div class="panel-bottom"></div>
+    </div>
+
+    <!-- third panel -->
+    <div class="panel">
+        <div class="panel-title">Plan C</div>
+        <div class="panel-container">
+            <div class="panel-summary collapsible">
+                <p>This is Plan C</p>
+                <p>Cost is $325</p>
+                <p>Family and Spouse</p>
+            </div>
+            <div class="panel-description collapsible">
+                <p>lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah
+                    lorem ipsum blah blah blah</p>
+            </div>
+        </div>
+        <div class="panel-bottom"></div>
+    </div>
+
+</div>
+
+
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script>
+
+    $('.panel-container').hide();
+
+    $('.panel').on({
+        'click':expandPanel,
+        'touchstart':expandPanel
+    });
+
+    function expandPanel (e){
+
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+            if (e.type === 'click') return;
+        }
+
+        $(e.target).next('.panel-container').slideToggle(700);
+
+    }
+
+</script>
+
+</body>
+</html>
