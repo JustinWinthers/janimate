@@ -1,44 +1,30 @@
 
-(function(window, factory){
+(function(window, document, factory){
 
     "use strict";
 
-    var jAnimate = window.jAnimate = function(el){
+    function Factory(el){
+        this.context = el
+    }
 
-            factory = jAnimate.factory || factory;
+    Factory.prototype = factory;
 
-            if (typeof el === 'string') el = document.querySelector(el);
+    window.jAnimate = function(el){
 
-            var Factory = function(el){
-                this.context = el
-            };
+        if (typeof el === 'string') el = document.querySelector(el);
 
-            Factory.prototype = factory;
+        var jAnimateObj = new Factory(el);
 
-            var jAnimateObj = new Factory(el);
+        jAnimateObj.context.janimate = jAnimateObj;
+        jAnimateObj.repeat = false;
 
-            //todo: will this circular reference cause memory issues?
-            jAnimateObj.context.janimate = jAnimateObj;
-            jAnimateObj.repeat = false;
+        return jAnimateObj;
+    };
 
-            return jAnimateObj;
-        },
+    factory.compile(document, factory);
 
-        compile = (function compile() {
 
-            var nodelist = document.querySelectorAll("div[janimate]");
-
-            Array.prototype.forEach.call(nodelist,function(el){
-
-                eval ("jAnimate(el)." + el.getAttribute("janimate"));
-
-            })})();
-
-    jAnimate.factory = factory;
-
-    jAnimate.newAnimation = factory.newAnimation;
-
-})(window, (function(){
+})(window, document, (function(){
 
         "use strict";
 
@@ -298,27 +284,72 @@
 
                 newAnimation: function(name, obj){
 
-                    jAnimate.factory[name] = function(eventType){
+                    this[name] = function(eventType){
 
                         var objVal = eval ( "(" + JSON.stringify(obj) + ")" );
 
-                        this.repeat = objVal.repeat;
+                        this.repeat = this.repeat || objVal.repeat;
 
                         delete objVal.repeat;
 
                         if (eventType) {
 
-                            var func = function(){jAnimate.factory.animate.call(this, objVal)};
+                            var func = function(){this.animate.call(this, objVal)};
 
-                            jAnimate.factory.assignEvents.call(this, func, eventType);
+                            this.assignEvents.call(this, func, eventType);
 
                         } else {
-                            jAnimate.factory.animate.call(this, objVal);
+                            this.animate.call(this, objVal);
                         }
 
                         return this;
 
                     };
+
+                },
+
+                compile: function compile(document, factory) {
+
+                    var nodelist = document.querySelectorAll("div[janimate]");
+
+                    Array.prototype.forEach.call(nodelist,function(el){
+
+                        var el = jAnimate(el), eventList = {};
+                        el.repeat = true;
+
+
+                        el.context.getAttribute("jAnimate").split(').').sort().forEach(function(func){
+
+                            var prop = func.split('(')[0];                        // get list of functions defined
+                            var val = func.split('(')[1].replace(/\)/g,'');  console.log (val);
+                            var args = val.split(',');                            // get the first parameter to
+                            var eventType = args[0].replace(/'/g,'').toString();  // get string value of first parm to see
+
+                            if (!factory.eventTypes.hasOwnProperty(eventType)) eventType = 'immediate';
+
+                            if (!eventList[eventType]) eventList[eventType] = {};
+
+                            eventList[eventType][prop] = (eventType === 'immediate') ? args[0] : args[1];
+                            eventList[eventType][prop] = eventList[eventType][prop].replace(/'/g,'');
+                        });
+
+
+                        Object.keys(eventList).forEach(function(key){
+
+                            var animationName = key + '_' +  Math.floor((Math.random() * 10000000000) + 1);
+                            var eventType = (key==='immediate') ? undefined : key;
+
+                            console.log (eventList[key]);
+
+                            el.newAnimation(animationName, eventList[key]);
+                            el[animationName]( eventType );
+                        });
+
+                        //determine objects created
+
+
+
+                    });
 
                 }
 
@@ -344,6 +375,7 @@
 
 
         return  {
+            compile:api.compile,
             duration:api.duration,
             spin:api.spin,
             turnBackground:api.turnBackground,
@@ -356,6 +388,7 @@
             moveLeft:api.moveLeft,
             newAnimation:api.newAnimation,
             assignEvents:_api.assignEvents,
-            animate:_api.animate
+            animate:_api.animate,
+            eventTypes: _eventTypes
         }
     })());
