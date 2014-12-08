@@ -4,24 +4,21 @@
     "use strict";
 
     function Factory(el){
+        this.repeatVal = false;
         this.context = el
     }
 
-    Factory.prototype = factory;
+    Factory.prototype = factory.api;
 
     window.jAnimate = function(el){
 
         if (typeof el === 'string') el = document.querySelector(el);
 
-        var jAnimateObj = new Factory(el);
+        return new Factory(el);
 
-        jAnimateObj.context.janimate = jAnimateObj;
-        jAnimateObj.repeat = false;
-
-        return jAnimateObj;
     };
 
-    factory.compile(document, factory);
+    factory.private.compile(document);
 
 
 })(window, document, (function(){
@@ -44,6 +41,55 @@
 
             _api = {
 
+                compile: function compile(document) {
+
+                    var nodelist = document.querySelectorAll("div[janimate]");
+
+                    Array.prototype.forEach.call(nodelist,function(el){
+
+                        var el = jAnimate(el), eventList = {};
+
+                        //el.repeat = el.repeat || false;
+
+                        var eventList = _api.buildEventList(el);
+
+                        Object.keys(eventList).forEach(function(key){
+
+                            var animationName = key + '_' +  Math.floor((Math.random() * 10000000000) + 1)
+                                ,eventType = (key==='immediate') ? undefined : key;
+
+                            el.newAnimation(animationName, eventList[key]);
+                            el[animationName]( eventType );
+                        });
+
+                    });
+                },
+
+
+                buildEventList: function(el){
+                    //this function requires an jAnimate object element
+
+                    var eventList = {};
+
+                    el.context.getAttribute("jAnimate").split(').').sort().forEach(function(func){
+
+                        var prop = func.split('(')[0];                        // get list of functions defined
+                        var val = func.split('(')[1].replace(/\)/g,'');
+                        var args = val.split(',');                            // get the first parameter to
+                        var eventType = args[0].replace(/'/g,'').toString();  // get string value of first parm to see
+
+                        if (!_eventTypes.hasOwnProperty(eventType)) eventType = 'immediate';
+
+                        if (!eventList[eventType]) eventList[eventType] = {};
+
+                        eventList[eventType][prop] = (eventType === 'immediate') ? args[0] : args[1];
+                        eventList[eventType][prop] = eventList[eventType][prop].replace(/'/g,'');
+                    });
+
+                    return eventList;
+
+                },
+
                 animate: function (objVal) {
 
                     var el = this;
@@ -51,9 +97,7 @@
                     Object.keys(objVal).forEach(function(key){
 
                         if (objVal.hasOwnProperty(key)) {
-
                             el[key](objVal[key]);
-
                         }
                     });
                 },
@@ -77,42 +121,44 @@
 
                 setDuration: function(duration) {
 
-                    this.style.webkitTransitionDuration = duration;
-                    this.style.mozTransitionDuration = duration;
-                    this.style.msTransitionDuration = duration;
-                    this.style.oTransitionDuration = duration;
-                    this.style.transitionDuration = duration;
+                    this.context.style.webkitTransitionDuration = duration;
+                    this.context.style.mozTransitionDuration = duration;
+                    this.context.style.msTransitionDuration = duration;
+                    this.context.style.oTransitionDuration = duration;
+                    this.context.style.transitionDuration = duration;
 
                     return this;
                 },
 
                 setTransform: function(transform) {
 
-                    if (this.janimate.transform && !this.janimate.repeat) {
-                        if (this.janimate.transform.indexOf(transform) !== -1) return;
+                    if (this.repeatVal) {
+                        this.context.style.webkitTransform += transform;
+                        this.context.style.mozTransform += transform;
+                        this.context.style.msTransform += transform;
+                        this.context.style.oTransform += transform;
+                        this.context.style.transform += transform;
+
+                    } else {
+
+                        this.context.style.webkitTransform = transform;
+                        this.context.style.mozTransform = transform;
+                        this.context.style.msTransform = transform;
+                        this.context.style.oTransform = transform;
+                        this.context.style.transform = transform;
                     }
 
-                    this.style.webkitTransform += transform;
-                    this.style.mozTransform += transform;
-                    this.style.msTransform += transform;
-                    this.style.oTransform += transform;
-                    this.style.transform += transform;
-
-                    this.janimate.transform += transform;
-
                 },
-
 
                 transform: function(eventType, val, transform) {
 
                     var func = function(){
 
+                        var jAnimateClosure = this;
+
                         return function(){
 
-                            // todo: figure out why I have to handle this
-                            // todo: why it works different when eventType exists via add new animation
-                            // todo: or via api
-                            _api[transform].call(this.context || this, val);
+                            _api[transform].call(jAnimateClosure, val);
 
                         }
 
@@ -124,7 +170,7 @@
 
                 backgroundColor: function(color){
 
-                    this.style.backgroundColor = color;
+                    this.context.style.backgroundColor = color;
                 },
 
                 scaleTransform: function(amount){
@@ -144,7 +190,7 @@
 
                 opacity: function(amount){
 
-                    this.style.opacity = amount;
+                    this.context.style.opacity = amount;
                 },
 
                 spinTransform: function(deg){
@@ -156,7 +202,6 @@
 
                     return _api.setTransform.call(this, "translateZ(" + z + ")");
                 }
-
             },
 
 
@@ -166,7 +211,15 @@
 
                 duration: function(duration) {
 
-                    _api.setDuration.call(this.context,duration);
+                    _api.setDuration.call(this,duration);
+
+                    return this;
+
+                },
+
+                repeat: function(bool) {
+
+                    this.repeatVal = (bool.toString() === 'true');
 
                     return this;
 
@@ -288,68 +341,23 @@
 
                         var objVal = eval ( "(" + JSON.stringify(obj) + ")" );
 
-                        this.repeat = this.repeat || objVal.repeat;
+                        //this.repeat = this.repeat || (objVal.repeat && objVal.repeat.toString() === 'true');
 
-                        delete objVal.repeat;
+                        //delete objVal.repeat;
 
                         if (eventType) {
 
-                            var func = function(){this.animate.call(this, objVal)};
+                            var func = function(){_api.animate.call(this, objVal)};
 
-                            this.assignEvents.call(this, func, eventType);
+                            _api.assignEvents.call(this, func, eventType);
 
                         } else {
-                            this.animate.call(this, objVal);
+                            _api.animate.call(this, objVal);
                         }
 
                         return this;
 
                     };
-
-                },
-
-                compile: function compile(document, factory) {
-
-                    var nodelist = document.querySelectorAll("div[janimate]");
-
-                    Array.prototype.forEach.call(nodelist,function(el){
-
-                        var el = jAnimate(el), eventList = {};
-                        el.repeat = true;
-
-
-                        el.context.getAttribute("jAnimate").split(').').sort().forEach(function(func){
-
-                            var prop = func.split('(')[0];                        // get list of functions defined
-                            var val = func.split('(')[1].replace(/\)/g,'');  console.log (val);
-                            var args = val.split(',');                            // get the first parameter to
-                            var eventType = args[0].replace(/'/g,'').toString();  // get string value of first parm to see
-
-                            if (!factory.eventTypes.hasOwnProperty(eventType)) eventType = 'immediate';
-
-                            if (!eventList[eventType]) eventList[eventType] = {};
-
-                            eventList[eventType][prop] = (eventType === 'immediate') ? args[0] : args[1];
-                            eventList[eventType][prop] = eventList[eventType][prop].replace(/'/g,'');
-                        });
-
-
-                        Object.keys(eventList).forEach(function(key){
-
-                            var animationName = key + '_' +  Math.floor((Math.random() * 10000000000) + 1);
-                            var eventType = (key==='immediate') ? undefined : key;
-
-                            console.log (eventList[key]);
-
-                            el.newAnimation(animationName, eventList[key]);
-                            el[animationName]( eventType );
-                        });
-
-                        //determine objects created
-
-
-
-                    });
 
                 }
 
@@ -373,22 +381,9 @@
 
             };
 
+        return {
+            api: api,
+            private: _api
+        };
 
-        return  {
-            compile:api.compile,
-            duration:api.duration,
-            spin:api.spin,
-            turnBackground:api.turnBackground,
-            grow:api.grow,
-            zoomOut:api.zoomOut,
-            opacity:api.opacity,
-            moveUp:api.moveUp,
-            moveDown:api.moveDown,
-            moveRight:api.moveRight,
-            moveLeft:api.moveLeft,
-            newAnimation:api.newAnimation,
-            assignEvents:_api.assignEvents,
-            animate:_api.animate,
-            eventTypes: _eventTypes
-        }
     })());
