@@ -25,33 +25,25 @@
 
         "use strict";
 
-        //local vars
+        var _api = {
 
-        var _eventTypes = {
-                hover: ['onmouseover'],
-                leave: ['onmouseout'],
-                click: ['onclick','ontouchstart'],
-                drag: ['ondrag'],
-                dragStart: ['ondragstart', 'ontouchstart'],
-                dragEnd: ['ondragend', 'ontouchend']
-            },
-
-
-        // local api
-
-            _api = {
+                eventTypes: {
+                    hover: ['onmouseover'],
+                    leave: ['onmouseout'],
+                    click: ['onclick','ontouchstart'],
+                    drag: ['ondrag'],
+                    dragStart: ['ondragstart', 'ontouchstart'],
+                    dragEnd: ['ondragend', 'ontouchend']
+                },
 
                 compile: function compile(document) {
 
-                    var nodelist = document.querySelectorAll("div[janimate]");
+                    var nodelist = document.querySelectorAll("[janimate]");
 
                     Array.prototype.forEach.call(nodelist,function(el){
 
-                        var el = jAnimate(el), eventList = {};
-
-                        //el.repeat = el.repeat || false;
-
-                        var eventList = _api.buildEventList(el);
+                        var el = jAnimate(el)
+                            ,eventList = _api.buildEventList(el);
 
                         Object.keys(eventList).forEach(function(key){
 
@@ -65,9 +57,7 @@
                     });
                 },
 
-
-                buildEventList: function(el){
-                    //this function requires an jAnimate object element
+                buildEventList: function(el /*jAnimate object*/ ){
 
                     var eventList = {};
 
@@ -78,7 +68,7 @@
                         var args = val.split(',');                            // get the first parameter to
                         var eventType = args[0].replace(/'/g,'').toString();  // get string value of first parm to see
 
-                        if (!_eventTypes.hasOwnProperty(eventType)) eventType = 'immediate';
+                        if (!_api.eventTypes.hasOwnProperty(eventType)) eventType = 'immediate';
 
                         if (!eventList[eventType]) eventList[eventType] = {};
 
@@ -88,6 +78,22 @@
 
                     return eventList;
 
+                },
+
+                validateArgList: function(args, signature){
+
+                    if (args.length !== signature) Array.prototype.unshift.call(args, null);
+
+                    return args;
+                },
+
+                getNum: function(val){
+
+                    var sign = ( typeof val === 'string' && val[0] === '-' ? -1 : +1);
+
+                    if (typeof val === 'string') val = val.replace(/[^0-9.]/g, "");
+
+                    return val * sign;
                 },
 
                 animate: function (objVal) {
@@ -112,9 +118,9 @@
 
                     var el = this;
 
-                    for (var i=0; i < _eventTypes[eventType].length; i++){
+                    for (var i=0; i < _api.eventTypes[eventType].length; i++){
 
-                        el.context[_eventTypes[eventType][i]] = function(){func.call(el);};
+                        el.context[_api.eventTypes[eventType][i]] = function(){func.call(el);};
                     }
 
                 },
@@ -130,9 +136,20 @@
                     return this;
                 },
 
+                setTiming: function(timingFunction) {
+
+                    this.context.style.webkitTransitionTimingFunction = timingFunction;
+                    this.context.style.mozTransitionTimingFunction = timingFunction;
+                    this.context.style.msTransitionTimingFunction = timingFunction;
+                    this.context.style.oTransitionTimingFunction = timingFunction;
+                    this.context.style.transitionTimingFunction = timingFunction;
+
+                    return this;
+                },
+
                 setTransform: function(transform) {
 
-                    if (this.repeatVal) {
+                    if (this.repeatVal.toString()==='true') {
                         this.context.style.webkitTransform += transform;
                         this.context.style.mozTransform += transform;
                         this.context.style.msTransform += transform;
@@ -152,11 +169,15 @@
 
                 transform: function(eventType, val, transform) {
 
+                    this.toggleState = !this.toggleState;
+
                     var func = function(){
 
                         var jAnimateClosure = this;
 
                         return function(){
+
+                            if (!jAnimateClosure.toggleState) val = 0;
 
                             _api[transform].call(jAnimateClosure, val);
 
@@ -217,9 +238,17 @@
 
                 },
 
+                timing: function(timingFunction) {
+
+                    _api.setTiming.call(this,timingFunction);
+
+                    return this;
+
+                },
+
                 repeat: function(bool) {
 
-                    this.repeatVal = (bool.toString() === 'true');
+                    this.repeatVal = (bool === 'toggle') ?  bool : (bool.toString() === 'true');
 
                     return this;
 
@@ -227,9 +256,9 @@
 
                 grow: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
-                    var eventType = args[0], growthMultiplier = helpers.getNum(args[1]);
+                    var eventType = args[0], growthMultiplier = _api.getNum(args[1]);
 
                     _api.transform.call(this, eventType, growthMultiplier, 'scaleTransform');
 
@@ -239,7 +268,7 @@
 
                 opacity: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
                     var eventType = args[0], amount = args[1];
 
@@ -251,9 +280,9 @@
 
                 spin: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
-                    var eventType = args[0], deg = helpers.getNum(args[1]);
+                    var eventType = args[0], deg = _api.getNum(args[1]);
 
                     _api.transform.call(this, eventType, deg + 'deg', 'spinTransform');
 
@@ -263,7 +292,7 @@
 
                 turnBackground: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
                     var eventType = args[0], color = args[1];
 
@@ -274,9 +303,9 @@
 
                 moveUp: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
-                    var eventType = args[0], px = '-' + helpers.getNum(args[1]) + 'px';
+                    var eventType = args[0], px = '-' + _api.getNum(args[1]) + 'px';
 
                     _api.transform.call(this, eventType, px, 'translateY');
 
@@ -286,9 +315,9 @@
 
                 moveDown: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
-                    var eventType = args[0], px = helpers.getNum(args[1]) + 'px';
+                    var eventType = args[0], px = _api.getNum(args[1]) + 'px';
 
                     _api.transform.call(this, eventType, px, 'translateY');
 
@@ -298,9 +327,9 @@
 
                 moveLeft: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
-                    var eventType = args[0], px = '-' + helpers.getNum(args[1]) + 'px';
+                    var eventType = args[0], px = '-' + _api.getNum(args[1]) + 'px';
 
                     _api.transform.call(this, eventType, px, 'translateX');
 
@@ -310,9 +339,9 @@
 
                 moveRight: function() {
 
-                    var args = helpers.validateArgList(arguments, 2);
+                    var args = _api.validateArgList(arguments, 2);
 
-                    var eventType = args[0], px = helpers.getNum(args[1]) + 'px';
+                    var eventType = args[0], px = _api.getNum(args[1]) + 'px';
 
                     _api.transform.call(this, eventType, px, 'translateX');
 
@@ -322,11 +351,11 @@
 
                 zoomOut: function() {
 
-                    var args = helpers.validateArgList(arguments, 3);
+                    var args = _api.validateArgList(arguments, 3);
 
                     var eventType = args[0],
-                        scale = helpers.getNum(args[1]),
-                        spinDegrees = helpers.getNum(args[2]);
+                        scale = _api.getNum(args[1]),
+                        spinDegrees = _api.getNum(args[2]);
 
                     _api.transform.call(this, eventType, scale, 'scaleTransform');
                     _api.transform.call(this, eventType, spinDegrees, 'spinTransform');
@@ -340,10 +369,6 @@
                     this[name] = function(eventType){
 
                         var objVal = eval ( "(" + JSON.stringify(obj) + ")" );
-
-                        //this.repeat = this.repeat || (objVal.repeat && objVal.repeat.toString() === 'true');
-
-                        //delete objVal.repeat;
 
                         if (eventType) {
 
@@ -359,24 +384,6 @@
 
                     };
 
-                }
-
-            },
-
-            helpers = {
-
-                validateArgList: function(args, signature){
-
-                    if (args.length !== signature) Array.prototype.unshift.call(args, null);
-
-                    return args;
-                },
-
-                getNum: function(val){
-
-                    if (typeof val === 'string') return val.replace(/[^0-9.]/g, "");
-
-                    return val;
                 }
 
             };
