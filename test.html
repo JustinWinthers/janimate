@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+<style>
+
+    div {
+        background-color: darkslateblue;
+        width: 100px;
+        height: 100px;
+        transition: all .5s ease;
+        margin-bottom: 100px;
+        padding: 25px;
+    }
+
+    div.circle {
+        border-radius: 50%;
+    }
+
+</style>
+
+
+<div janimate="timing('ease-in').duration('3s').spin('hover',180).spin('leave',-180)" style="background-color: blue">
+
+    <div janimate="duration('4s').repeat('toggle').spin('hover',780)" style="background-color: yellow; width: 50px; height: 50px"></div>
+
+</div>
+
+<div style="position: relative">
+    <div style="background-color: darkslategrey; position: absolute; top: 0px; left: 0px">
+        <p style="color: white; font-size: 10px; width: 50px">
+            reveal the content under the page
+        </p>
+    </div>
+    <div janimate="repeat('toggle').timing('ease-in-out').moveRight('click',100px)" style="background-color: purple; position: absolute; top: 0px; left: 0px"></div>
+</div>
+
+<div id="animate2" class="circle"></div>
+
+<div id="animateme" janimate="spin('hover','-200deg').grow('hover',2).spin('leave','200deg').grow('leave',.5).duration('5s').repeat(true)" >
+
+</div>
+
+<div id="animate3" style="background-color: green"></div>
+
+
+
+<script src="jAnimate.js"></script>
+
+<script>
+
+    jAnimate('#animate3').timing('ease-in-out').spin('180deg').grow('hover',2).grow('leave',.5).repeat('true');
+
+    jAnimate('#animate3').context.onclick = function(){
+        var obj = jAnimate('#animateme');
+        obj.repeat('false').duration('300ms').moveRight('200px');
+    };
+
+
+    var otherObj = jAnimate('#animate2');
+
+    otherObj.newAnimation('myCustomAnimationHover',{
+        duration:'3s',
+        repeat:true,
+        spin:'50deg',
+        grow:'2',
+        moveRight:'1000'
+
+    });
+
+    otherObj.newAnimation('myCustomAnimationLeave',{
+        grow:'.5',
+        repeat:false,
+        spin:'-50deg',
+        moveLeft:'100px',
+        opacity: 1
+    });
+
+
+    otherObj.myCustomAnimationHover('hover');
+    otherObj.myCustomAnimationLeave('leave');
+
+</script>
+
+</body>
+</html>
