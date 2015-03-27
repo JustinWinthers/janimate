@@ -20,6 +20,18 @@
         border-radius: 50%;
     }
 
+    div.line {
+        position: relative;
+        bottom: -50px;
+        height: 75%;
+        width: 1px;
+        background-color: #ffffff;
+        margin: 0 auto;
+        border: 0px;
+        border-radius: 0;
+        padding: 0;
+    }
+
 </style>
 
 
@@ -31,14 +43,16 @@
 
 <div style="position: relative">
     <div style="background-color: darkslategrey; position: absolute; top: 0px; left: 0px">
-        <p style="color: white; font-size: 10px; width: 50px">
+        <p style="color: white; font-size: 10px;">
             reveal the content under the page
         </p>
     </div>
-    <div janimate="repeat('toggle').timing('ease-in-out').moveRight('click',100px)" style="background-color: purple; position: absolute; top: 0px; left: 0px"></div>
+    <div janimate="repeat('toggle').timing('ease-in-out').moveRight('click',100%)" style="background-color: purple; position: absolute; top: 0px; left: 0px"></div>
 </div>
 
-<div id="animate2" class="circle"></div>
+<div id="animate2" class="circle">
+    <div class="line"></div>
+</div>
 
 <div id="animateme" janimate="spin('hover','-200deg').grow('hover',2).spin('leave','200deg').grow('leave',.5).duration('5s').repeat(true)" >
 
@@ -63,25 +77,23 @@
     var otherObj = jAnimate('#animate2');
 
     otherObj.newAnimation('myCustomAnimationHover',{
-        duration:'3s',
-        repeat:true,
-        spin:'50deg',
-        grow:'2',
-        moveRight:'1000'
-
+        repeat:'true',
+        duration:'3000',
+        moveRight: '750',
+        spin:'360',
+        grow: 2
     });
 
     otherObj.newAnimation('myCustomAnimationLeave',{
-        grow:'.5',
-        repeat:false,
-        spin:'-50deg',
-        moveLeft:'100px',
-        opacity: 1
+        repeat:'toggle',
+        duration:'3s',
+        moveRight: '-750',
+        spin:'-750'
     });
 
 
     otherObj.myCustomAnimationHover('hover');
-    otherObj.myCustomAnimationLeave('leave');
+    otherObj.myCustomAnimationLeave('click');
 
 </script>
 

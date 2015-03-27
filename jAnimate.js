@@ -30,7 +30,7 @@
                 eventTypes: {
                     hover: ['onmouseover'],
                     leave: ['onmouseout'],
-                    click: ['onclick','ontouchstart'],
+                    click: ['onclick'],
                     drag: ['ondrag'],
                     dragStart: ['ondragstart', 'ontouchstart'],
                     dragEnd: ['ondragend', 'ontouchend']
@@ -127,6 +127,11 @@
 
                 setDuration: function(duration) {
 
+                    // assume milliseconds if not second attribute was provided
+                    duration = (duration.indexOf('s') === -1 && duration.indexOf('ms') === -1) ? duration + 'ms' : duration;
+
+
+
                     this.context.style.webkitTransitionDuration = duration;
                     this.context.style.mozTransitionDuration = duration;
                     this.context.style.msTransitionDuration = duration;
@@ -149,22 +154,51 @@
 
                 setTransform: function(transform) {
 
-                    if (this.repeatVal.toString()==='true') {
-                        this.context.style.webkitTransform += transform;
-                        this.context.style.mozTransform += transform;
-                        this.context.style.msTransform += transform;
-                        this.context.style.oTransform += transform;
-                        this.context.style.transform += transform;
+                    if ( (this.repeatVal.toString()==='false') && (this.context.style.transform.indexOf(transform.split('(')[0]) !== -1) ) {
 
-                    } else {
+                        return false;
+                    }
+
+                    if (this.repeatVal.toString()==='toggle') {
 
                         this.context.style.webkitTransform = transform;
                         this.context.style.mozTransform = transform;
                         this.context.style.msTransform = transform;
                         this.context.style.oTransform = transform;
                         this.context.style.transform = transform;
+
+                    } else {
+
+                        this.context.style.webkitTransform += transform;
+                        this.context.style.mozTransform += transform;
+                        this.context.style.msTransform += transform;
+                        this.context.style.oTransform += transform;
+                        this.context.style.transform += transform;
+
                     }
 
+                    // reset transform property so it doesn't keep building up with each
+                    // successive call.  Do this once animation is complete.
+                    if (this.repeatVal.toString() === 'true'){
+
+
+                        var milliseconds = (typeof this.context.style.transitionDuration === 'string' &&
+                            this.context.style.transitionDuration.indexOf('ms') !== -1) ? 1 : 1000;
+                        var duration = _api.getNum(this.context.style.transitionDuration) * milliseconds;
+                        var context = this;
+
+                        if (!duration) duration=500;
+
+                        setTimeout(function(){
+
+                            context.context.style.webkitTransform = '';
+                            context.context.style.mozTransform = '';
+                            context.context.style.msTransform = '';
+                            context.context.style.oTransform = '';
+                            context.context.style.transform = '';
+
+                        }, duration);
+                    }
                 },
 
                 transform: function(eventType, val, transform) {
@@ -177,7 +211,9 @@
 
                         return function(){
 
-                            if (!jAnimateClosure.toggleState) val = 0;
+                            if (jAnimateClosure.repeatVal==='toggle' && !jAnimateClosure.toggleState){
+                                val = (transform==='scaleTransform') ? 1 : 0;
+                            }
 
                             _api[transform].call(jAnimateClosure, val);
 
