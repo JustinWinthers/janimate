@@ -22,60 +22,27 @@ bower install janimate
 ```
 
 ### How do I use it?
-The most common example of how to use this tool follows.  Send in a
-an object literal and path to an html template.  The default
-tokens for finding a variable to replace are {{ and }}.  The object
-property names must match the variable names in the template.  The object
-can be an infinite number of levels deep.
+ Coming soon...
+
+
+## Using it in your HTML
+
+
+```html
+<div janimate="duration('4s').repeat('toggle').spin('hover',780)" style="background-color: yellow; width: 50px; height: 50px"></div>
+```
+
+## Using it in your javaScript
 
 
 ```js
- var quickTemplate = require('./quickTemplate');
- var json = require('./scope.json');  //this can be a json file or any object literal
+    jAnimate('#myElement').timing('ease-in-out').spin('180deg').grow('hover',2).grow('leave',.5).repeat('true');
 
- quickTemplate(json, __dirname + '/partial.html', function(err, data){
- console.log (data);
- });
-```
+    jAnimate('#myElement').context.onclick = function(){
+        var obj = jAnimate('#animateme');
+        obj.repeat('false').duration('300ms').moveRight('200px');
+    };
 
-## Sending in an html string instead of file
-
-You can send in an html string as well instead of a path to a file.
- If so, you must send in the options parm with 'string' set to true.
- Additionally, you can override the tokens used for variable replacement
- as part of the options object as well by substituting your preferred values
- for the tokenLeft and tokenRight properties.
-
-```js
- quickTemplate(json, "<p>{{ foo  }}  <span> {{ bar }} </span></p>", {string:true}, function(err, data){
- console.log (data);
- });
-
-```
-
-in the above example the json object would look like:
-
-```
- {"foo":"some value","bar":"some other value"}
-```
-
-## Customize your template tokens
-
-Using the example above, you can use any delimiter you choose in your document.  quickTemplate defaults to
-double mustaches, but you can use the tokenLeft and tokenRight options to customize the tokens used as
-in this example....
-
-```js
- quickTemplate(json, "<p><% foo  %>  <span> <% bar %> </span></p>", {string:true, tokenLeft:'<%', tokenRight:'%>'}, function(err, data){
- console.log (data);
- });
-
-```
-
-in the above example the json object would still look exactly the same:
-
-```
- {"foo":"some value","bar":"some other value"}
 ```
 
 
