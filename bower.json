@@ -1,0 +1,30 @@
+{
+  "name": "janimate",
+  "version": "0.0.1",
+  "homepage": "https://github.com/JustinWinthers/janimate",
+  "authors": [
+    "Justin Winthers",
+    "Digital Advisors LLC",
+    "http://www.digitaladvisors.io"
+  ],
+  "description": "A declarative animation framework for your projects",
+  "main": "src/janimate.js",
+  "keywords": [
+    "janimate.js",
+    "css",
+    "transitions",
+    "css",
+    "transforms",
+    "javascript",
+    "animations"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".*",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
