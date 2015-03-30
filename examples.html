@@ -85,18 +85,21 @@
         duration:'3000',
         moveRight: '750',
         spin:'360',
-        grow: 2
+        grow: 2,
+        event:'hover'
     });
 
+
     otherObj.newAnimation('myCustomAnimationLeave',{
+        //event:'click',
         repeat:'toggle',
         duration:'3s',
         moveRight: '-750',
         spin:'-750'
     });
 
+    //otherObj.myCustomAnimationHover('hover');
 
-    otherObj.myCustomAnimationHover('hover');
     otherObj.myCustomAnimationLeave('click');
 
 </script>
